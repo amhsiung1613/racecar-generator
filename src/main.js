@@ -1,6 +1,6 @@
 // Amber Hsiung
-// Endless Runner
-// An endless dodging game
+// Slime Run
+// An endless runner game
 // Barrier prefab adapted from Travis Faas, An Introduction to HTML5 Game Development with Phaser.js (2017)
 // Original: 4/20/17 (Phaser CE version)
 // Updated: 5/1/23 (Phaser 3.55)
@@ -42,10 +42,10 @@ let centerY = game.config.height/2;
 let w = game.config.width;
 let h = game.config.height;
 const textSpacer = 64;
-let paddle = null;
-const paddleWidth = 16;
-const paddleHeight = 128;
-const paddleVelocity = 150;
+// let paddle = null;
+// const paddleWidth = 16;
+// const paddleHeight = 128;
+// const paddleVelocity = 150;
 let level;
 let highScore;
 let newHighScore = false;

@@ -58,10 +58,10 @@ class Play extends Phaser.Scene {
         // set up player paddle (physics sprite) and set properties
         paddle = this.physics.add.sprite(32, centerY, 'paddle').setOrigin(0.5);
         paddle.setCollideWorldBounds(true);
-        paddle.setBounce(0.5);
+        //paddle.setBounce(0.5);
         paddle.setImmovable();
-        paddle.setMaxVelocity(0, 600);
-        paddle.setDragY(200);
+        //paddle.setMaxVelocity(0, 600);
+        //paddle.setDragY(200);
         paddle.setDepth(1);             // ensures that paddle z-depth remains above shadow paddles
         paddle.destroyed = false;       // custom property to track paddle life
         paddle.setBlendMode('SCREEN');  // set a WebGL blend mode
@@ -114,6 +114,11 @@ class Play extends Phaser.Scene {
             // lock shadow paddle spawning to a given time interval
             this.time.delayedCall(15, () => { this.shadowLock = false; })
         }
+
+        this.nightSky.tilePositionX -= 1
+        this.background.tilePositionX -= 2
+        this.midground.tilePositionX -= 3
+        this.foreground.tilePositionX -= 4
     }
 
     levelBump() {
@@ -130,9 +135,9 @@ class Play extends Phaser.Scene {
             }
             
             // make flying score text (using three stacked)
-            let lvltxt01 = this.add.bitmapText(w, centerY, 'gem', `<${level}>`, 96).setOrigin(0, 0.5);
-            let lvltxt02 = this.add.bitmapText(w, centerY, 'gem', `<${level}>`, 96).setOrigin(0, 0.5);
-            let lvltxt03 = this.add.bitmapText(w, centerY, 'gem', `<${level}>`, 96).setOrigin(0, 0.5);
+            let lvltxt01 = this.add.bitmapText(w, centerY, 'courier', `<${level}>`, 96).setOrigin(0, 0.5);
+            let lvltxt02 = this.add.bitmapText(w, centerY, 'courier', `<${level}>`, 96).setOrigin(0, 0.5);
+            let lvltxt03 = this.add.bitmapText(w, centerY, 'courier', `<${level}>`, 96).setOrigin(0, 0.5);
             lvltxt01.setBlendMode('ADD').setTint(0xff00ff);
             lvltxt02.setBlendMode('SCREEN').setTint(0x0000ff);
             lvltxt03.setBlendMode('ADD').setTint(0xffff00);
