@@ -9,8 +9,8 @@ class Title extends Phaser.Scene {
         let title02 = this.add.bitmapText(centerX, centerY, 'gem', 'Slime Run', 64).setOrigin(0.5).setTint(0xff00ff).setBlendMode('SCREEN');
         let title03 = this.add.bitmapText(centerX, centerY, 'gem', 'Slime Run', 64).setOrigin(0.5).setTint(0xffff00).setBlendMode('ADD');
        
-        this.add.bitmapText(centerX, centerY + textSpacer, 'gem', 'Use the UP & DOWN ARROWS to dodge color paddles', 24).setOrigin(0.5);
-        this.add.bitmapText(centerX, centerY + textSpacer*3, 'gem', 'Press UP ARROW to Start', 36).setOrigin(0.5);
+        this.add.bitmapText(centerX, centerY + textSpacer, 'gem', 'Use the SPACE BAR to dodge obstacles', 24).setOrigin(0.5);
+        this.add.bitmapText(centerX, centerY + textSpacer*3, 'gem', 'Press SPACE to Start', 36).setOrigin(0.5);
         this.add.bitmapText(centerX, h - textSpacer, 'gem', 'Amber Hsiung Winter 2024', 16).setOrigin(0.5);
 
         // title text tween
@@ -38,12 +38,12 @@ class Title extends Phaser.Scene {
         });
 
         // set up cursor keys
-        cursors = this.input.keyboard.createCursorKeys();  
+        keys = this.input.keyboard.createCursorKeys();   
     }
 
     update() {
         // check for UP input
-        if (Phaser.Input.Keyboard.JustDown(cursors.up)) {
+        if (Phaser.Input.Keyboard.JustDown(keys.space)) {
             let textureManager = this.textures;
             // take snapshot of the entire game viewport
             // https://newdocs.phaser.io/docs/3.55.2/Phaser.Renderer.WebGL.WebGLRenderer#snapshot

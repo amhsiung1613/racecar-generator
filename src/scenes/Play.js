@@ -9,6 +9,9 @@ class Play extends Phaser.Scene {
         this.background = this.add.tileSprite(0, 0, 960, 640, 'background').setOrigin(0, 0)
         this.midground = this.add.tileSprite(0, 0, 960, 640, 'midground').setOrigin(0, 0)
         this.foreground = this.add.tileSprite(0, 0, 960, 640, 'foreground').setOrigin(0, 0)
+        this.ground = this.add.tileSprite(0, 0, 960, 640, 'ground').setOrigin(0, 0)
+        // this.ground.physics.add.existing(this); 
+        // this.ground.setImmovable();
 
         // reset parameters
         this.barrierSpeed = -450;
@@ -44,27 +47,28 @@ class Play extends Phaser.Scene {
         // create line on right side of screen for particles source
         let line = new Phaser.Geom.Line(w, 0, w, h);  
         // create particle manager  
-        this.particleManager = this.add.particles('cross');
+        this.particleManager = this.add.particles('particle');
         // add emitter and setup properties
         this.lineEmitter = this.particleManager.createEmitter({
             gravityX: -200,
-            lifespan: 5000,
-            alpha: { start: 0.5, end: 0.1 },
-            tint: [ 0xffff00, 0xff0000, 0x00ff00, 0x00ffff, 0x0000ff ],
-            emitZone: { type: 'random', source: line, quantity: 150 },
-            blendMode: 'ADD'
+            lifespan: 7000,
+            alpha: { start: 0.3, end: 0.0 },
+            //tint: [ 0xffff00, 0xff0000, 0x00ff00, 0x00ffff, 0x0000ff ],
+            emitZone: { type: 'random', source: line, quantity: 500 },
+            blendMode: 'MULTIPLY'
         });
 
         // set up player paddle (physics sprite) and set properties
-        paddle = this.physics.add.sprite(32, centerY, 'paddle').setOrigin(0.5);
-        paddle.setCollideWorldBounds(true);
+        slime = new Slime(this, 32, 608, 'slime', 0, 'down')
+        //slime = this.physics.add.sprite(32, centerY, 'slime').setOrigin(0.5);
+        slime.setCollideWorldBounds(true);
         //paddle.setBounce(0.5);
-        paddle.setImmovable();
+        slime.setImmovable();
         //paddle.setMaxVelocity(0, 600);
         //paddle.setDragY(200);
-        paddle.setDepth(1);             // ensures that paddle z-depth remains above shadow paddles
-        paddle.destroyed = false;       // custom property to track paddle life
-        paddle.setBlendMode('SCREEN');  // set a WebGL blend mode
+        slime.setDepth(1);             // ensures that paddle z-depth remains above shadow paddles
+        slime.destroyed = false;       // custom property to track paddle life
+        //paddle.setBlendMode('SCREEN');  // set a WebGL blend mode
 
         // set up barrier group
         this.barrierGroup = this.add.group({
@@ -75,6 +79,30 @@ class Play extends Phaser.Scene {
             this.addBarrier(); 
         });
 
+        // // group with all active platforms.
+        // this.platformGroup = this.add.group({
+
+        //     // once a platform is removed, it's added to the pool
+        //     removeCallback: function(platform){
+        //         platform.scene.platformPool.add(platform)
+        //     }
+        // });
+
+        // // pool
+        // this.platformPool = this.add.group({
+
+        //     // once a platform is removed from the pool, it's added to the active platforms group
+        //     removeCallback: function(platform){
+        //         platform.scene.platformGroup.add(platform)
+        //     }
+        // });
+
+        // // number of consecutive jumps made by the player
+        // this.playerJumps = 0;
+
+        // // adding a platform to the game, the arguments are platform width and x position
+        // this.addPlatform(game.config.width, game.config.width / 2);
+
         // set up difficulty timer (triggers callback every second)
         this.difficultyTimer = this.time.addEvent({
             delay: 1000,
@@ -84,7 +112,8 @@ class Play extends Phaser.Scene {
         });
 
         // set up cursor keys
-        cursors = this.input.keyboard.createCursorKeys();
+        this.keys = this.input.keyboard.createCursorKeys();
+        slime.anims.play('jump')
     }
 
     // create new barriers and add them to existing barrier group
@@ -95,21 +124,24 @@ class Play extends Phaser.Scene {
     }
 
     update() {
+        this.slimeFSM.step()
         // make sure paddle is still alive
-        if(!paddle.destroyed) {
+        if(!slime.destroyed) {
             // check for player input
-            if(cursors.up.isDown) {
-                paddle.body.velocity.y -= paddleVelocity;
-            } else if(cursors.down.isDown) {
-                paddle.body.velocity.y += paddleVelocity;
-            }
+            if(keys.space.isDown) {
+            //     this.slime.State
+            // //    slime.body.velocity.y -= slimeVelocity;
+            //  } else if(keys.space.isDown) {
+            // //     slime.body.velocity.y += slimeVelocity;
+            // // }
             // check for collisions
-            this.physics.world.collide(paddle, this.barrierGroup, this.paddleCollision, null, this);
+            this.physics.world.collide(slime, this.barrierGroup, this.slimeCollision, null, this);
+            }
         }
 
         // spawn rainbow trail if in EXTREME mode
-        if(this.extremeMODE && !this.shadowLock && !paddle.destroyed) {
-            this.spawnShadowPaddles();
+        if(this.extremeMODE && !this.shadowLock && !slime.destroyed) {
+            this.spawnShadowSlime();
             this.shadowLock = true;
             // lock shadow paddle spawning to a given time interval
             this.time.delayedCall(15, () => { this.shadowLock = false; })
@@ -119,6 +151,8 @@ class Play extends Phaser.Scene {
         this.background.tilePositionX -= 2
         this.midground.tilePositionX -= 3
         this.foreground.tilePositionX -= 4
+
+        
     }
 
     levelBump() {
@@ -135,9 +169,9 @@ class Play extends Phaser.Scene {
             }
             
             // make flying score text (using three stacked)
-            let lvltxt01 = this.add.bitmapText(w, centerY, 'courier', `<${level}>`, 96).setOrigin(0, 0.5);
-            let lvltxt02 = this.add.bitmapText(w, centerY, 'courier', `<${level}>`, 96).setOrigin(0, 0.5);
-            let lvltxt03 = this.add.bitmapText(w, centerY, 'courier', `<${level}>`, 96).setOrigin(0, 0.5);
+            let lvltxt01 = this.add.bitmapText(w, centerY, 'gem', `<${level}>`, 96).setOrigin(0, 0.5);
+            let lvltxt02 = this.add.bitmapText(w, centerY, 'gem', `<${level}>`, 96).setOrigin(0, 0.5);
+            let lvltxt03 = this.add.bitmapText(w, centerY, 'gem', `<${level}>`, 96).setOrigin(0, 0.5);
             lvltxt01.setBlendMode('ADD').setTint(0xff00ff);
             lvltxt02.setBlendMode('SCREEN').setTint(0x0000ff);
             lvltxt03.setBlendMode('ADD').setTint(0xffff00);
@@ -173,11 +207,11 @@ class Play extends Phaser.Scene {
 
         // set HARD mode
         if(level == 45) {
-            paddle.scaleY = 0.75;       // 3/4 paddle size
+            slime.scaleY = 0.75;       // 3/4 paddle size
         }
         // set EXTREME mode
         if(level == 75) {
-            paddle.scaleY = 0.5;        // 1/2 paddle size
+            slime.scaleY = 0.5;        // 1/2 paddle size
             this.extremeMODE = true;    // 🌈
         }
     }
@@ -193,26 +227,26 @@ class Play extends Phaser.Scene {
         return color;
     }
 
-    spawnShadowPaddles() {
+    spawnShadowSlime() {
         // add a "shadow paddle" at main paddle position
-        let shadowPaddle = this.add.image(paddle.x, paddle.y, 'paddle').setOrigin(0.5);
-        shadowPaddle.scaleY = paddle.scaleY;            // scale to parent paddle
-        shadowPaddle.tint = Math.random() * 0xFFFFFF;   // tint w/ rainbow colors
-        shadowPaddle.alpha = 0.5;                       // make semi-transparent
+        let shadowSlime = this.add.image(slime.x, slime.y, 'slime').setOrigin(0.5);
+        shadowSlime.scaleY = slime.scaleY;            // scale to parent paddle
+        shadowSlime.tint = Math.random() * 0xFFFFFF;   // tint w/ rainbow colors
+        shadowSlime.alpha = 0.5;                       // make semi-transparent
         // tween shadow paddle alpha to 0
         this.tweens.add({ 
-            targets: shadowPaddle, 
+            targets: shadowSlime, 
             alpha: { from: 0.5, to: 0 }, 
             duration: 750,
             ease: 'Linear',
             repeat: 0 
         });
         // set a kill timer for trail effect
-        this.time.delayedCall(750, () => { shadowPaddle.destroy(); } );
+        this.time.delayedCall(750, () => { shadowSlime.destroy(); } );
     }
 
-    paddleCollision() {
-        paddle.destroyed = true;                    // turn off collision checking
+    slimeCollision() {
+        slime.destroyed = true;                    // turn off collision checking
         this.difficultyTimer.destroy();             // shut down timer
         this.sound.play('death', { volume: 0.25 }); // play death sound
         this.cameras.main.shake(2500, 0.0075);      // camera death shake
@@ -226,7 +260,7 @@ class Play extends Phaser.Scene {
         });
 
         // create particle explosion
-        let deathParticleManager = this.add.particles('cross');
+        let deathParticleManager = this.add.particles('particle');
         let deathEmitter = deathParticleManager.createEmitter({
             alpha: { start: 1, end: 0 },
             scale: { start: 0.75, end: 0 },
@@ -235,9 +269,9 @@ class Play extends Phaser.Scene {
             blendMode: 'ADD'
         });
         // store current paddle bounds so we can create a paddle-shaped death emitter
-        let pBounds = paddle.getBounds();
+        let sBounds = slime.getBounds();
         deathEmitter.setEmitZone({
-            source: new Phaser.Geom.Rectangle(pBounds.x, pBounds.y, pBounds.width, pBounds.height),
+            source: new Phaser.Geom.Rectangle(sBounds.x, sBounds.y, sBounds.width, sBounds.height),
             type: 'edge',
             quantity: 1000
         });
@@ -246,8 +280,8 @@ class Play extends Phaser.Scene {
         
         // create two gravity wells: one offset from paddle and one at center screen
         deathParticleManager.createGravityWell({
-            x: pBounds.centerX + 200,
-            y: pBounds.centerY,
+            x: sBounds.centerX + 200,
+            y: sBounds.centerY,
             power: 0.5,
             epsilon: 100,
             gravity: 100
@@ -261,7 +295,7 @@ class Play extends Phaser.Scene {
         });
        
         // kill paddle
-        paddle.destroy();    
+        slime.destroy();    
 
         // switch states after timer expires
         this.time.delayedCall(4000, () => { this.scene.start('gameOverScene'); });
