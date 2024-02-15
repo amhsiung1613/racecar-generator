@@ -10,8 +10,7 @@ class Play extends Phaser.Scene {
         this.midground = this.add.tileSprite(0, 0, 960, 640, 'midground').setOrigin(0, 0)
         this.foreground = this.add.tileSprite(0, 0, 960, 640, 'foreground').setOrigin(0, 0)
         this.ground = this.add.tileSprite(0, 0, 960, 640, 'ground').setOrigin(0, 0)
-        // this.ground.physics.add.existing(this); 
-        // this.ground.setImmovable();
+
 
         // reset parameters
         this.barrierSpeed = -450;
