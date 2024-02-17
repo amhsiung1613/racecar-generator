@@ -5,9 +5,9 @@ class Title extends Phaser.Scene {
 
     create() {
         // add title screen text
-        let title01 = this.add.bitmapText(centerX, centerY, 'gem', 'Slime Run', 64).setOrigin(0.5).setTint(0xff0000);
-        let title02 = this.add.bitmapText(centerX, centerY, 'gem', 'Slime Run', 64).setOrigin(0.5).setTint(0xff00ff).setBlendMode('SCREEN');
-        let title03 = this.add.bitmapText(centerX, centerY, 'gem', 'Slime Run', 64).setOrigin(0.5).setTint(0xffff00).setBlendMode('ADD');
+        let title01 = this.add.bitmapText(centerX, centerY, 'gem', 'Slime Jump', 64).setOrigin(0.5).setTint(0xff0000);
+        let title02 = this.add.bitmapText(centerX, centerY, 'gem', 'Slime Jump', 64).setOrigin(0.5).setTint(0xff00ff).setBlendMode('SCREEN');
+        let title03 = this.add.bitmapText(centerX, centerY, 'gem', 'Slime Jump', 64).setOrigin(0.5).setTint(0xffff00).setBlendMode('ADD');
        
         this.add.bitmapText(centerX, centerY + textSpacer, 'gem', 'Use the SPACE BAR to dodge obstacles', 24).setOrigin(0.5);
         this.add.bitmapText(centerX, centerY + textSpacer*3, 'gem', 'Press SPACE to Start', 36).setOrigin(0.5);
@@ -36,6 +36,7 @@ class Title extends Phaser.Scene {
             },
             onRepeatScope: this
         });
+        this.sound.play('intro', {volume: 0.5})
 
         // set up cursor keys
         keys = this.input.keyboard.createCursorKeys();   

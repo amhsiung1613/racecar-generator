@@ -22,7 +22,7 @@ class Play extends Phaser.Scene {
         // set up audio, play bgm
         this.bgm = this.sound.add('beats', { 
             mute: false,
-            volume: 1,
+            volume: 0.5,
             rate: 1,
             loop: true 
         });
@@ -58,49 +58,29 @@ class Play extends Phaser.Scene {
         });
 
         // set up player paddle (physics sprite) and set properties
-        slime = new Slime(this, 32, 608, 'slime', 0, 'down')
+        slime = new Slime(this, 100, 608, 'slime', 0, 'down')
         //slime = this.physics.add.sprite(32, centerY, 'slime').setOrigin(0.5);
         slime.setCollideWorldBounds(true);
-        //paddle.setBounce(0.5);
+        //slime.setBounce(0.5);
         slime.setImmovable();
-        //paddle.setMaxVelocity(0, 600);
+        slime.setMaxVelocity(0, 600);
         //paddle.setDragY(200);
         slime.setDepth(1);             // ensures that paddle z-depth remains above shadow paddles
         slime.destroyed = false;       // custom property to track paddle life
-        //paddle.setBlendMode('SCREEN');  // set a WebGL blend mode
+        slime.setBlendMode('SCREEN');  // set a WebGL blend mode
 
         // set up barrier group
         this.barrierGroup = this.add.group({
             runChildUpdate: true    // make sure update runs on group children
         });
+        
         // wait a few seconds before spawning barriers
         this.time.delayedCall(2500, () => { 
+            
             this.addBarrier(); 
         });
 
-        // // group with all active platforms.
-        // this.platformGroup = this.add.group({
-
-        //     // once a platform is removed, it's added to the pool
-        //     removeCallback: function(platform){
-        //         platform.scene.platformPool.add(platform)
-        //     }
-        // });
-
-        // // pool
-        // this.platformPool = this.add.group({
-
-        //     // once a platform is removed from the pool, it's added to the active platforms group
-        //     removeCallback: function(platform){
-        //         platform.scene.platformGroup.add(platform)
-        //     }
-        // });
-
-        // // number of consecutive jumps made by the player
-        // this.playerJumps = 0;
-
-        // // adding a platform to the game, the arguments are platform width and x position
-        // this.addPlatform(game.config.width, game.config.width / 2);
+    
 
         // set up difficulty timer (triggers callback every second)
         this.difficultyTimer = this.time.addEvent({
@@ -112,29 +92,31 @@ class Play extends Phaser.Scene {
 
         // set up cursor keys
         this.keys = this.input.keyboard.createCursorKeys();
-        slime.anims.play('jump')
+        
     }
 
     // create new barriers and add them to existing barrier group
     addBarrier() {
+        this.sound.play('platform', {volume: 1.5})
         let speedVariance =  Phaser.Math.Between(0, 50);
         let barrier = new Barrier(this, this.barrierSpeed - speedVariance);
         this.barrierGroup.add(barrier);
+        
     }
 
     update() {
-        this.slimeFSM.step()
         // make sure paddle is still alive
         if(!slime.destroyed) {
             // check for player input
             if(keys.space.isDown) {
+                this.slimeFSM.step()
             //     this.slime.State
             // //    slime.body.velocity.y -= slimeVelocity;
             //  } else if(keys.space.isDown) {
             // //     slime.body.velocity.y += slimeVelocity;
             // // }
             // check for collisions
-            this.physics.world.collide(slime, this.barrierGroup, this.slimeCollision, null, this);
+                this.physics.world.collide(slime, this.barrierGroup, this.slimeCollision, null, this);
             }
         }
 
