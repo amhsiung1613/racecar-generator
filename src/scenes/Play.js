@@ -59,12 +59,9 @@ class Play extends Phaser.Scene {
 
         // set up player paddle (physics sprite) and set properties
         slime = new Slime(this, 100, 608, 'slime', 0, 'down')
-        //slime = this.physics.add.sprite(32, centerY, 'slime').setOrigin(0.5);
         slime.setCollideWorldBounds(true);
-        //slime.setBounce(0.5);
         slime.setImmovable();
         slime.setMaxVelocity(0, 600);
-        //paddle.setDragY(200);
         slime.setDepth(1);             // ensures that paddle z-depth remains above shadow paddles
         slime.destroyed = false;       // custom property to track paddle life
         slime.setBlendMode('SCREEN');  // set a WebGL blend mode
@@ -105,19 +102,13 @@ class Play extends Phaser.Scene {
     }
 
     update() {
+        this.slimeFSM.step()
         // make sure paddle is still alive
         if(!slime.destroyed) {
-            // check for player input
-            if(keys.space.isDown) {
-                this.slimeFSM.step()
-            //     this.slime.State
-            // //    slime.body.velocity.y -= slimeVelocity;
-            //  } else if(keys.space.isDown) {
-            // //     slime.body.velocity.y += slimeVelocity;
-            // // }
             // check for collisions
-                this.physics.world.collide(slime, this.barrierGroup, this.slimeCollision, null, this);
-            }
+            this.physics.world.collide(slime, this.barrierGroup, this.slimeCollision, null, this);
+            //}
+            
         }
 
         // spawn rainbow trail if in EXTREME mode
@@ -178,9 +169,6 @@ class Play extends Phaser.Scene {
                 y: '+=20'       // slowly nudge y-coordinate down
             });
  
-            // change game border color
-            let rndColor = this.getRandomColor();
-            document.getElementsByTagName('canvas')[0].style.borderColor = rndColor;
 
             // cam shake: .shake( [duration] [, intensity] )
             this.cameras.main.shake(100, 0.01);

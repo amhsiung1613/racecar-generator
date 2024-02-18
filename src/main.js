@@ -2,20 +2,16 @@
 // Slime Run
 // An endless runner game
 // Barrier prefab adapted from Travis Faas, An Introduction to HTML5 Game Development with Phaser.js (2017)
+// inpsired by Nathan Altice's Paddle Parkour
 // inspired by Emanuele Feronato's endless runner tutorial
+// creative tilt
+//      created the art for the background as well as implemented the parallax scrolling and implementing sound
+//      use local storage to keep track of browser's high score as well as figuring out jump mechanics
 
 // keep me honest
 'use strict';
 
-//global game options
-let gameOptions = {
-    spawnRange: [100, 350],
-    platformSizeRange: [100, 250],
-    //playerGravity: 900,
-    jumpForce: 400,
-    playerStartPosition: 200,
-    jumps: 2    
-}
+
 // define and configure main Phaser game object
 let config = {
     parent: 'myGame',
@@ -29,7 +25,7 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true,
+            debug: false,
             gravity: {
                 x: 0,
                 y: 0
@@ -51,14 +47,9 @@ let centerY = game.config.height/2;
 let w = game.config.width;
 let h = game.config.height;
 const textSpacer = 64;
-// let paddle = null;
-// const paddleWidth = 16;
-// const paddleHeight = 128;
-// const paddleVelocity = 150;
 let slime = null;
 const slimeHeight = 16;
 const slimeWidth = 16;
-//const slimeVelocity = 150;
 let level;
 let highScore;
 let newHighScore = false;

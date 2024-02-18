@@ -10,11 +10,8 @@ class Slime extends Phaser.Physics.Arcade.Sprite {
         this.body.setCollideWorldBounds(true)
 
         // set custom Hero properties
-        //this.direction = direction 
         this.slimeVelocity = 0    // in pixels
         this.setGravity(150)
-        // this.dashCooldown = 300    // in ms
-        // this.hurtTimer = 250       // in ms
 
         // initialize state machine managing hero (initial state, possible states, state args[])
         scene.slimeFSM = new StateMachine('run', {
@@ -27,6 +24,10 @@ class Slime extends Phaser.Physics.Arcade.Sprite {
 class RunState extends State {
     enter(scene, slime) {
         //slime.setVelocity(100)
+        if (slime.destroyed) {
+            //this.stateMachine.transition('run')
+            return
+        }
         slime.anims.play('run')
     }
 
@@ -46,13 +47,14 @@ class JumpState extends State {
         //check that slime is alive
         if (slime.destroyed) {
             this.stateMachine.transition('run')
+            return
         }
-        
+
         scene.sound.play('jump_sound', {volume: 1})
-        slime.setVelocity(0, -150)
-        slime.once('animationcomplete', () => {
-            this.stateMachine.transition('run')
-        })
+        slime.setVelocity(0, -200)
+        //slime.once('animationcomplete', () => {
+        this.stateMachine.transition('run')
+        //})
     }
 }
 
