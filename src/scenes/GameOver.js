@@ -36,9 +36,9 @@ class GameOver extends Phaser.Scene {
         this.add.bitmapText(centerX, centerY, 'gem', `Press SPACE BAR to Restart`, 36).setOrigin(0.5);
 
         // add credits text
-        this.add.bitmapText(centerX, centerY + textSpacer, 'gem', 'Music from Bensound', 24).setOrigin(0.5);
-        this.add.bitmapText(centerX, centerY + textSpacer*1.5, 'gem', 'Sound effects from Pixabay', 24).setOrigin(0.5);
-        this.add.bitmapText(centerX, centerY + textSpacer*2, 'gem', 'Game play inspired by Nathan Altice, Travis Faas, and Emanuele Feronato', 24).setOrigin(0.5);
+        // this.add.bitmapText(centerX, centerY + textSpacer, 'gem', 'Music from Bensound', 24).setOrigin(0.5);
+        // this.add.bitmapText(centerX, centerY + textSpacer*1.5, 'gem', 'Sound effects from Pixabay', 24).setOrigin(0.5);
+        // this.add.bitmapText(centerX, centerY + textSpacer*2, 'gem', 'Game play inspired by Nathan Altice, Travis Faas, and Emanuele Feronato', 24).setOrigin(0.5);
         // set up cursor keys
         keys = this.input.keyboard.createCursorKeys();
     }

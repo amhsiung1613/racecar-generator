@@ -11,7 +11,7 @@ class Title extends Phaser.Scene {
        
         this.add.bitmapText(centerX, centerY + textSpacer, 'gem', 'Use the SPACE BAR to dodge obstacles', 24).setOrigin(0.5);
         this.add.bitmapText(centerX, centerY + textSpacer*3, 'gem', 'Press SPACE to Start', 36).setOrigin(0.5);
-        this.add.bitmapText(centerX, h - textSpacer, 'gem', 'Amber Hsiung Winter 2024', 16).setOrigin(0.5);
+        // this.add.bitmapText(centerX, h - textSpacer, 'gem', 'Amber Hsiung Winter 2024', 16).setOrigin(0.5);
 
         // title text tween
         this.tweens.add({

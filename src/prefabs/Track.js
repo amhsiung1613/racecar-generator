@@ -10,15 +10,15 @@ class Track extends Phaser.Physics.Arcade.Sprite {
         this.parentScene.physics.add.existing(this);    // add to physics system
         // this.setVelocityX(velocity);            // make it go!
         this.setImmovable();                    
-        this.newBarrier = true;                 // custom property to control barrier spawning
+        this.newTrack = true;                 // custom property to control barrier spawning
     }
 
     update() {
-        // add new trac when existing track leaves the top edge of the map
-        if(this.newBarrier && this.x < game.config.height) {
+        // add new track when existing track leaves the top edge of the map
+        if(this.newTrack && this.x < game.config.height) {
             // (recursively) call parent scene method from this context
-            this.parentScene.addBarrier(this.parent, this.velocity);
-            this.newBarrier = false;
+            this.parentScene.addTrack(this.parent, this.velocity);
+            this.newTrack = false;
         }
 
         // destroy paddle if it reaches the left edge of the screen

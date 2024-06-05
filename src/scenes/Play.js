@@ -67,9 +67,9 @@ class Play extends Phaser.Scene {
         // car.setBlendMode('SCREEN');  // set a WebGL blend mode
 
         // set up barrier group
-        // this.barrierGroup = this.add.group({
-        //     runChildUpdate: true    // make sure update runs on group children
-        // });
+        this.trackGroup = this.add.group({
+            runChildUpdate: true    // make sure update runs on group children
+        });
         
         // wait a few seconds before spawning barriers
         // this.time.delayedCall(2500, () => { 
@@ -93,13 +93,13 @@ class Play extends Phaser.Scene {
     }
 
     // create new barriers and add them to existing barrier group
-    // addBarrier() {
-    //     this.sound.play('platform', {volume: 1.5})
-    //     let speedVariance =  Phaser.Math.Between(0, 50);
-    //     let barrier = new Barrier(this, this.barrierSpeed - speedVariance);
-    //     this.barrierGroup.add(barrier);
+    addTrack() {
+        // this.sound.play('platform', {volume: 1.5})
+        // let speedVariance =  Phaser.Math.Between(0, 50);
+        let track = new Track(this, this.trackSpeed - speedVariance);
+        this.trackGroup.add(track);
         
-    // }
+    }
 
     update() {
         // this.slimeFSM.step()
