@@ -25,7 +25,7 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false,
+            debug: true,
             gravity: {
                 x: 0,
                 y: 0
@@ -47,9 +47,9 @@ let centerY = game.config.height/2;
 let w = game.config.width;
 let h = game.config.height;
 const textSpacer = 64;
-let slime = null;
-const slimeHeight = 16;
-const slimeWidth = 16;
+let car = null;
+// const slimeHeight = 16;
+// const slimeWidth = 16;
 let level;
 let highScore;
 let newHighScore = false;

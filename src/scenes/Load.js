@@ -16,14 +16,10 @@ class Load extends Phaser.Scene {
             loadingBar.destroy();
         });
 
+        //loading assets
         this.load.path = './assets/';
         // load graphics assets
-        this.load.spritesheet('slime', 'slime-sheet.png', {
-            frameWidth: 32,
-            frameHeight: 32,
-        })
-         this.load.image('platform', 'img/paddle.png');
-        // this.load.image('fragment', 'img/fragment.png');
+        this.load.image('platform', 'img/paddle.png');
         this.load.image('particle', 'img/particle.png');
         this.load.image('ground', 'img/ground.png');
         this.load.image('foreground', 'img/foreground_buildings.png');
@@ -43,21 +39,6 @@ class Load extends Phaser.Scene {
     }
 
     create() {
-        //slime run animation
-        this.anims.create({
-            key: 'run',
-            frameRate: 8,
-            repeat: -1,
-            frames: this.anims.generateFrameNumbers('slime', { start: 0, end: 7}),
-        })
-
-        //slime jump animation
-        this.anims.create({
-            key: 'jump',
-            framerate: 1,
-            repeat: 0,
-            frames: this.anims.generateFrameNumbers('slime', {start: 8, end: 15}),
-        })
         // check for local storage browser support
         if(window.localStorage) {
             console.log('Local storage supported');
