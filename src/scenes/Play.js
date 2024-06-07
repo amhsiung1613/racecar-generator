@@ -18,6 +18,8 @@ class Play extends Phaser.Scene {
         my.sprite.car = this.physics.add.sprite(game.config.width / 2, game.config.height / 2, "car");
         my.sprite.car.setScale(0.025);
         my.sprite.car.setCollideWorldBounds(true);
+        my.sprite.car.setDepth(1);
+
 
         my.sprite.corner = this.physics.add.sprite(game.config.width / 4, game.config.height / 4, "corner");
         my.sprite.corner.setScale(0.5)
