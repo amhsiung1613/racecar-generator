@@ -16,8 +16,11 @@ class Play extends Phaser.Scene {
         my.sprite.car = this.physics.add.sprite(game.config.width / 2, game.config.height / 2, "car");
         my.sprite.car.setScale(0.025);
         my.sprite.car.setCollideWorldBounds(true);
-        my.sprite.corner = this.add.sprite(game.config.width / 4, game.config.height / 4, "corner");
+
+        my.sprite.corner = this.physics.add.sprite(game.config.width / 4, game.config.height / 4, "corner");
         my.sprite.corner.setScale(0.5)
+        my.sprite.long = this.physics.add.sprite(game.config.width / 8, game.config.height / 8, "long");
+        my.sprite.long.setScale(0.5)
 
         // Create key objects
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -58,8 +61,20 @@ class Play extends Phaser.Scene {
             this.carSpeed,
             car.body.velocity
         );
+        if (this.collides(this.my.sprite.corner, car)) {
+            this.carSpeed = 0;
+            console.log("car hit")
+            // car.destroy();
+        }
     }
 
+
+    // A center-radius AABB collision check
+    collides(a, b) {
+        if (Math.abs(a.x - b.x) > (a.displayWidth/2 + b.displayWidth/2)) return false;
+        if (Math.abs(a.y - b.y) > (a.displayHeight/2 + b.displayHeight/2)) return false;
+        return true;
+    }
 
     // create new barriers and add them to existing barrier group
     addTrack() {
@@ -118,7 +133,7 @@ class Play extends Phaser.Scene {
         });
        
         // kill paddle
-        slime.destroy();    
+        car.destroy();    
 
         // switch states after timer expires
         this.time.delayedCall(4000, () => { this.scene.start('gameOverScene'); });
