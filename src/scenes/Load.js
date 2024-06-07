@@ -21,7 +21,11 @@ class Load extends Phaser.Scene {
         // load graphics assets
         // this.load.image('name', 'img/path.png');
         this.load.image('car', 'img/car.png');
-        
+        this.load.image('corner', 'img/corner_track.png');
+        this.load.image('long', 'img/long_track.png');
+        this.load.image('med', 'img/med_track.png');
+        this.load.image('short', 'img/short_track.png');
+
         // load audio assets
         // this.load.audio('name', ['audio/music.mp3']);
         
