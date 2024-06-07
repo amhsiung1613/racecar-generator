@@ -3,6 +3,10 @@ class Title extends Phaser.Scene {
         super('titleScene');
     }
 
+    preload() {
+        this.load.audio('startSound', '../assets/audio/race_start.wav');
+    }
+
     create() {
         // Set up necessary variables
         const centerX = this.cameras.main.width / 2;
@@ -40,7 +44,8 @@ class Title extends Phaser.Scene {
             }
         });
 
-        // this.sound.play('intro', { volume: 0.5 });
+        this.startSound = this.sound.add('startSound');
+
 
         // Set up cursor keys
         this.keys = this.input.keyboard.createCursorKeys();
@@ -49,8 +54,11 @@ class Title extends Phaser.Scene {
     update() {
         // Check for SPACE input
         if (Phaser.Input.Keyboard.JustDown(this.keys.space)) {
+            this.startSound.play();
             // Start next scene
-            this.scene.start('playScene');
+            this.time.delayedCall(1000, () => {
+                this.scene.start('playScene');
+            });
         }
     }
 }
