@@ -191,6 +191,11 @@ class Play extends Phaser.Scene {
         this.down = this.input.keyboard.addKey("S");
 
         this.addTrack();
+
+        //engine sounds
+        this.engineSound = this.sound.add('engine');
+        this.engineSound = this.sound.add('engine' , {loop:true});
+        this.engineSound.play();
     }
 
     update() {
@@ -241,6 +246,10 @@ class Play extends Phaser.Scene {
             this.carSpeed = 10;
             console.log("car off track");
         }
+
+        //engine sound changing
+        let pitch = 1 +(this.carSpeed/ this.maxSpeed);
+        this.engineSound.setRate(pitch);
     }
 
     // A center-radius AABB collision check

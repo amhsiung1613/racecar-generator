@@ -24,11 +24,5 @@ class Credits extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(this.keys.left)) {
             this.scene.start('titleScene');
         }
-
-        //Check for Right arrow
-        if(Phaser.Input.Keyboard.JustDown(this.keys.right)) {
-            //go to credits
-            this.scene.start('creditsScene');
-        }
     }
 }

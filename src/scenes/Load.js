@@ -32,6 +32,8 @@ class Load extends Phaser.Scene {
         this.load.audio('carStart', 'audio/car_start.mp3');
         this.load.audio('carCrash', 'audio/car_crash.mp3');
         this.load.audio('raceMusic', 'audio/8bit_racing_music.mp3');
+        //engine sound
+        this.load.audio('engine', 'sounds/engine.mp3')
 
         // load font
         this.load.bitmapFont('edit', 'font/edit.png', 'font/edit.xml');

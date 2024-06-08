@@ -63,5 +63,11 @@ class Title extends Phaser.Scene {
                 this.scene.start('playScene');
             });
         }
+
+        //Check for Right arrow
+        if(Phaser.Input.Keyboard.JustDown(this.keys.right)) {
+            //go to credits
+            this.scene.start('creditsScene');
+        }
     }
 }
