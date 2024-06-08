@@ -20,6 +20,7 @@ let config = {
     width: 960,
     pixelArt: true,
     scale: {
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     physics: {
