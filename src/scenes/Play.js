@@ -193,7 +193,6 @@ class Play extends Phaser.Scene {
         this.addTrack();
 
         //engine sounds
-        this.engineSound = this.sound.add('engine');
         this.engineSound = this.sound.add('engine' , {loop:true});
         this.engineSound.play();
     }

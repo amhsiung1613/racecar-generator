@@ -33,7 +33,7 @@ let config = {
             }
         }
     },
-    scene: [ Load, Title, Play, GameOver ]
+    scene: [ Load, Title, Play, GameOver, Credits ]
 }
 
 // uncomment the following line if you need to purge local storage data
