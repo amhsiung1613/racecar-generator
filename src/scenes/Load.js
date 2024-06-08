@@ -25,6 +25,7 @@ class Load extends Phaser.Scene {
         this.load.image('long', 'img/long_track.png');
         this.load.image('med', 'img/med_track.png');
         this.load.image('short', 'img/short_track.png');
+        this.load.image('title', 'img/race_title.png');
 
         // load audio assets
         // this.load.audio('name', ['audio/music.mp3']);
@@ -33,7 +34,7 @@ class Load extends Phaser.Scene {
         this.load.audio('raceMusic', 'audio/8bit_racing_music.mp3');
 
         // load font
-        this.load.bitmapFont('gem', 'font/gem.png', 'font/gem.xml');
+        this.load.bitmapFont('edit', 'font/edit.png', 'font/edit.xml');
 
     }
 
