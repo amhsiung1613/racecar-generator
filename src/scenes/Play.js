@@ -1,48 +1,41 @@
-
 class Play extends Phaser.Scene {
     constructor() {
         super('playScene');
         this.my = { sprite: {}, text: {} };
         this.carSpeed = 0;
-        this.maxSpeed = 200; // Maximum speed of the car
-        this.acceleration = 10; // Acceleration rate
-        this.deceleration = 5; // Deceleration rate
-        this.rotationSpeed = 0.05; // Rotation speed in radians
+        this.maxSpeed = 200;
+        this.acceleration = 10;
+        this.deceleration = 5;
+        this.rotationSpeed = 0.05;
 
         this.my.trackArray = [];
-        this.trackPath = []; // Array to store the positions and directions of track pieces
+        this.trackPath = [];
         this.directions = [
             { x: 1, y: 0, angle: 0 },    // Right
             { x: -1, y: 0, angle: 180 }, // Left
             { x: 0, y: 1, angle: 90 },   // Down
             { x: 0, y: -1, angle: -90 }  // Up
         ];
-        this.placedPositions = new Set(); // Set to store placed positions
+        this.placedPositions = new Set();
         this.startX = 0;
         this.startY = 0;
-        this.maxAttempts = 10; // Maximum attempts to find a valid position for a track piece
+        this.maxAttempts = 10;
     }
 
     create() {
-        // Generate the track first to get the starting position
         this.addTrack();
 
         let my = this.my;
 
-        // Set up player car (physics sprite) and set properties
         my.sprite.car = this.physics.add.sprite(this.startX, this.startY, "car");
         my.sprite.car.setScale(0.025);
         my.sprite.car.setCollideWorldBounds(true);
         my.sprite.car.setDepth(1);
 
-        // Set the world bounds (e.g., 4000x4000 pixels)
         this.physics.world.setBounds(0, 0, 4000, 4000);
         this.cameras.main.setBounds(0, 0, 4000, 4000);
-
-        // Make the camera follow the car
         this.cameras.main.startFollow(my.sprite.car);
 
-        // Create key objects
         this.cursors = this.input.keyboard.createCursorKeys();
         this.left = this.input.keyboard.addKey("A");
         this.right = this.input.keyboard.addKey("D");
@@ -53,7 +46,6 @@ class Play extends Phaser.Scene {
     update() {
         let car = this.my.sprite.car;
 
-        // Update car velocity
         this.physics.velocityFromRotation(
             Phaser.Math.DegToRad(car.angle),
             this.carSpeed,
@@ -69,16 +61,13 @@ class Play extends Phaser.Scene {
             }
         }
 
-        // Checks if the car is on or off the track
         if (isOnTrack) {
-            // Handle rotation
             if (this.left.isDown) {
                 car.angle -= Phaser.Math.RadToDeg(this.rotationSpeed);
             } else if (this.right.isDown) {
                 car.angle += Phaser.Math.RadToDeg(this.rotationSpeed);
             }
 
-            // Handle acceleration and deceleration
             if (this.up.isDown) {
                 this.carSpeed += this.acceleration;
                 if (this.carSpeed > this.maxSpeed) {
@@ -98,19 +87,17 @@ class Play extends Phaser.Scene {
         }
     }
 
-    // A center-radius AABB collision check
     collides(a, b) {
         if (Math.abs(a.x - b.x) > (a.displayWidth / 2 + b.displayWidth / 2)) return false;
         if (Math.abs(a.y - b.y) > (a.displayHeight / 2 + b.displayHeight / 2)) return false;
         return true;
     }
 
-    // Create new barriers and add them to existing barrier group
     addTrack() {
         let attempts = 0;
         while (attempts < this.maxAttempts) {
             if (this.generateTrack()) {
-                return; // Successfully generated track
+                return;
             }
             attempts++;
         }
@@ -118,17 +105,16 @@ class Play extends Phaser.Scene {
     }
 
     generateTrack() {
-        this.my.trackArray.forEach(track => track.destroy()); // Clear existing track pieces
+        this.my.trackArray.forEach(track => track.destroy());
         this.my.trackArray = [];
         this.trackPath = [];
         this.placedPositions = new Set();
 
         let my = this.my;
-        let trackLength = 20; // Number of track pieces
+        let trackLength = 20;
         this.startX = game.config.width / 2;
         this.startY = game.config.height / 2;
 
-        // Initial direction is upward (north)
         let currentDirection = { x: 0, y: -1, angle: -90 };
         this.trackPath.push({ x: this.startX, y: this.startY, direction: currentDirection });
         this.placedPositions.add(`${this.startX},${this.startY}`);
@@ -144,8 +130,15 @@ class Play extends Phaser.Scene {
 
             while (!isValidPosition && attempts < this.maxAttempts) {
                 newDirection = this.chooseNextDirection(currentDirection);
-                newX = lastX + newDirection.x * 100;
-                newY = lastY + newDirection.y * 100;
+                if (i % 5 === 0) {
+                    // Corner piece
+                    newX = lastX + newDirection.x * 142;
+                    newY = lastY + newDirection.y * 134;
+                } else {
+                    // Long piece
+                    newX = lastX + newDirection.x * 101;
+                    newY = lastY + newDirection.y * 363;
+                }
 
                 isValidPosition = this.isValidTrackPosition(newX, newY);
                 attempts++;
@@ -157,7 +150,7 @@ class Play extends Phaser.Scene {
             }
 
             if (!isValidPosition) {
-                return false; // Failed to generate a valid track
+                return false;
             }
 
             let trackPiece;
@@ -172,20 +165,18 @@ class Play extends Phaser.Scene {
             }
 
             trackPiece.setScale(0.5);
-            trackPiece.setImmovable(true); // Make track pieces immovable
+            trackPiece.setImmovable(true);
             my.trackArray.push(trackPiece);
 
             lastX = newX;
             lastY = newY;
-            currentDirection = newDirection; // Update current direction
+            currentDirection = newDirection;
         }
 
-        return true; // Successfully generated track
+        return true;
     }
 
-    // Choose the next direction based on the current direction
     chooseNextDirection(currentDirection) {
-        // Simplified to always continue in the current direction or turn left/right
         let possibleDirections = this.directions.filter(dir => 
             (dir.x === currentDirection.x && dir.y === currentDirection.y) ||
             (dir.angle === (currentDirection.angle + 90) % 360) ||
@@ -194,29 +185,18 @@ class Play extends Phaser.Scene {
         return Phaser.Math.RND.pick(possibleDirections);
     }
 
-    // Set hitbox size and offset based on the orientation of the track piece
-
-    //car can register as off track even when its still on track hitbox
-
     setTrackPieceHitbox(trackPiece, angle, type) {
-        // Reset the body size to its default
         trackPiece.body.setSize(trackPiece.width, trackPiece.height);
 
         if (type === 'long') {
             if (angle === 0 || angle === 180) {
-                // Horizontal
                 trackPiece.body.setSize(trackPiece.displayWidth, trackPiece.displayHeight);
-                // trackPiece.body.setOffset(0, trackPiece.displayHeight);
             } else {
-                // Vertical
-                trackPiece.body.setSize(trackPiece.displayWidth * 3.5, trackPiece.displayHeight/4.2);
-                // trackPiece.body.setOffset(trackPiece.displayWidth / 4, 0);
-                
+                trackPiece.body.setSize(trackPiece.displayWidth * 3.5, trackPiece.displayHeight / 4.2);
             }
         }
     }
 
-    // Check if a track position is valid (not overlapping with existing tracks)
     isValidTrackPosition(x, y) {
         return !this.placedPositions.has(`${x},${y}`);
     }
