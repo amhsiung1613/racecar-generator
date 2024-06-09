@@ -9,7 +9,10 @@ class Play extends Phaser.Scene {
         this.rotationSpeed = 0.05;
 
         this.spawnDelay = 2000; // Initial spawn delay for traffic
-        // this.my.sprite.enemy = [];
+        this.speed = 100; // Initial speed for traffic
+
+        this.startX = game.config.width / 2; // Set a default start position
+        this.startY = game.config.height - 100;
     }
 
     create() {
@@ -30,14 +33,14 @@ class Play extends Phaser.Scene {
         this.up = this.input.keyboard.addKey("W");
         this.down = this.input.keyboard.addKey("S");
 
-        this.engineSound = this.sound.add('engine' , {loop:true});
+        this.engineSound = this.sound.add('engine', { loop: true });
         this.engineSound.play();
 
         // Display background image
         this.backgroundImage = this.add.tileSprite(0, 0, 700, 700, "road").setOrigin(0, 0);
 
         // Group for traffic
-        this.trafficGroup = this.add.group();
+        this.trafficGroup = this.physics.add.group();
 
         // Initial traffic spawn event
         this.spawnTrafficEvent = this.time.addEvent({
@@ -51,7 +54,7 @@ class Play extends Phaser.Scene {
     update() {
         let car = this.my.sprite.car;
 
-        let pitch = 1 +(this.carSpeed/ this.maxSpeed);
+        let pitch = 1 + (this.carSpeed / this.maxSpeed);
         this.engineSound.setRate(pitch);
 
         this.physics.velocityFromRotation(
@@ -87,11 +90,12 @@ class Play extends Phaser.Scene {
             console.log("car off track");
         }
 
-        //////
-
         // Move and wrap background image
-        // this.backgroundImage.tilePositionY -= this.speed;
-        // this.wrapBackground();
+        this.backgroundImage.tilePositionY -= this.carSpeed / 10;
+        this.wrapBackground();
+        
+        // Update traffic speed
+        this.setTrafficVelocity(this.carSpeed);
     }
 
     collides(a, b) {
@@ -102,7 +106,7 @@ class Play extends Phaser.Scene {
 
     setTrafficVelocity(speed) {
         this.trafficGroup.getChildren().forEach((traffic) => {
-            traffic.setVelocityY(speed * 0.5); // Slow down the traffic speed
+            traffic.setVelocityY(speed * 0.5); // Adjust traffic speed to match the car speed
         });
     }
 
@@ -119,14 +123,12 @@ class Play extends Phaser.Scene {
     }
 
     spawnTraffic() {
-        console.log("test");
         const trafficSprites = ["corner", "long", "med"];
         const spawnPositions = [200, 300, 400, 500];
         const randomSprite = Phaser.Utils.Array.GetRandom(trafficSprites);
         const randomX = Phaser.Utils.Array.GetRandom(spawnPositions);
         const traffic = this.physics.add.sprite(randomX, -150, randomSprite).setScale(0.3);
-        // Set a smaller rectangle for the traffic hitbox
-        traffic.setVelocityY(this.speed); // Initial velocity to match the road speed
+        traffic.setVelocityY(this.speed); // Set initial velocity to match the road speed
         this.trafficGroup.add(traffic);
     }
 }
