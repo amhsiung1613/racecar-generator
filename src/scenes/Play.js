@@ -41,10 +41,16 @@ class Play extends Phaser.Scene {
         this.right = this.input.keyboard.addKey("D");
         this.up = this.input.keyboard.addKey("W");
         this.down = this.input.keyboard.addKey("S");
+
+        this.engineSound = this.sound.add('engine' , {loop:true});
+        this.engineSound.play();
     }
 
     update() {
         let car = this.my.sprite.car;
+
+        let pitch = 1 +(this.carSpeed/ this.maxSpeed);
+        this.engineSound.setRate(pitch);
 
         this.physics.velocityFromRotation(
             Phaser.Math.DegToRad(car.angle),
