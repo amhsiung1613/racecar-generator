@@ -4,7 +4,7 @@ class Title extends Phaser.Scene {
     }
 
     preload() {
-        this.load.audio('startSound', '../assets/audio/race_start.wav');
+        // this.load.audio('startSound', '../assets/audio/race_start.wav');
     }
 
     create() {
