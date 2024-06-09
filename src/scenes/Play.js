@@ -30,8 +30,8 @@ class Play extends Phaser.Scene {
         my.sprite.car.setCollideWorldBounds(true);
         my.sprite.car.setDepth(1);
 
-        this.physics.world.setBounds(0, 0, 4000, 4000);
-        this.cameras.main.setBounds(0, 0, 4000, 4000);
+        this.physics.world.setBounds(0, 0, game.config.width, game.config.height);
+        this.cameras.main.setBounds(0, 0, game.config.width, game.config.height);
         this.cameras.main.startFollow(my.sprite.car);
 
         this.cursors = this.input.keyboard.createCursorKeys();
