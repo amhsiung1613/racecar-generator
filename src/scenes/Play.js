@@ -23,8 +23,6 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-        this.addTrack();
-
         let my = this.my;
 
         my.sprite.car = this.physics.add.sprite(this.startX, this.startY, "car");
@@ -44,6 +42,9 @@ class Play extends Phaser.Scene {
 
         this.engineSound = this.sound.add('engine' , {loop:true});
         this.engineSound.play();
+
+        // Display background image
+        this.backgroundImage = this.add.tileSprite(0, 0, 700, 700, "road").setOrigin(0, 0);
     }
 
     update() {
@@ -58,7 +59,7 @@ class Play extends Phaser.Scene {
             car.body.velocity
         );
 
-        let isOnTrack = false;
+        let isOnTrack = true;
 
         for (let track of this.my.trackArray) {
             if (this.collides(track, car)) {
@@ -97,113 +98,5 @@ class Play extends Phaser.Scene {
         if (Math.abs(a.x - b.x) > (a.displayWidth / 2 + b.displayWidth / 2)) return false;
         if (Math.abs(a.y - b.y) > (a.displayHeight / 2 + b.displayHeight / 2)) return false;
         return true;
-    }
-
-    addTrack() {
-        let attempts = 0;
-        while (attempts < this.maxAttempts) {
-            if (this.generateTrack()) {
-                return;
-            }
-            attempts++;
-        }
-        console.error("Failed to generate a valid track after maximum attempts");
-    }
-
-    generateTrack() {
-        this.my.trackArray.forEach(track => track.destroy());
-        this.my.trackArray = [];
-        this.trackPath = [];
-        this.placedPositions = new Set();
-
-        let my = this.my;
-        let trackLength = 20;
-        this.startX = game.config.width / 2;
-        this.startY = game.config.height / 2;
-
-        let currentDirection = { x: 0, y: -1, angle: -90 };
-        this.trackPath.push({ x: this.startX, y: this.startY, direction: currentDirection });
-        this.placedPositions.add(`${this.startX},${this.startY}`);
-
-        let lastX = this.startX;
-        let lastY = this.startY;
-
-        for (let i = 0; i < trackLength; i++) {
-            let newDirection;
-            let newX, newY;
-            let isValidPosition = false;
-            let attempts = 0;
-
-            while (!isValidPosition && attempts < this.maxAttempts) {
-                newDirection = this.chooseNextDirection(currentDirection);
-                if (i % 5 === 0) {
-                    // Corner piece
-                    newX = lastX + newDirection.x * 142;
-                    newY = lastY + newDirection.y * 134;
-                } else {
-                    // Long piece
-                    newX = lastX + newDirection.x * 101;
-                    newY = lastY + newDirection.y * 363;
-                }
-
-                isValidPosition = this.isValidTrackPosition(newX, newY);
-                attempts++;
-
-                if (isValidPosition) {
-                    this.trackPath.push({ x: newX, y: newY, direction: newDirection });
-                    this.placedPositions.add(`${newX},${newY}`);
-                }
-            }
-
-            if (!isValidPosition) {
-                return false;
-            }
-
-            let trackPiece;
-            if (i % 5 === 0) {
-                trackPiece = this.physics.add.sprite(newX, newY, "corner");
-                trackPiece.setAngle(newDirection.angle);
-                this.setTrackPieceHitbox(trackPiece, newDirection.angle, 'corner');
-            } else {
-                trackPiece = this.physics.add.sprite(newX, newY, "long");
-                trackPiece.setAngle(newDirection.angle);
-                this.setTrackPieceHitbox(trackPiece, newDirection.angle, 'long');
-            }
-
-            trackPiece.setScale(0.5);
-            trackPiece.setImmovable(true);
-            my.trackArray.push(trackPiece);
-
-            lastX = newX;
-            lastY = newY;
-            currentDirection = newDirection;
-        }
-
-        return true;
-    }
-
-    chooseNextDirection(currentDirection) {
-        let possibleDirections = this.directions.filter(dir => 
-            (dir.x === currentDirection.x && dir.y === currentDirection.y) ||
-            (dir.angle === (currentDirection.angle + 90) % 360) ||
-            (dir.angle === (currentDirection.angle - 90 + 360) % 360)
-        );
-        return Phaser.Math.RND.pick(possibleDirections);
-    }
-
-    setTrackPieceHitbox(trackPiece, angle, type) {
-        trackPiece.body.setSize(trackPiece.width, trackPiece.height);
-
-        if (type === 'long') {
-            if (angle === 0 || angle === 180) {
-                trackPiece.body.setSize(trackPiece.displayWidth, trackPiece.displayHeight);
-            } else {
-                trackPiece.body.setSize(trackPiece.displayWidth * 3.5, trackPiece.displayHeight / 4.2);
-            }
-        }
-    }
-
-    isValidTrackPosition(x, y) {
-        return !this.placedPositions.has(`${x},${y}`);
     }
 }

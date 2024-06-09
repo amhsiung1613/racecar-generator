@@ -26,6 +26,7 @@ class Load extends Phaser.Scene {
         this.load.image('med', 'img/med_track.png');
         this.load.image('short', 'img/short_track.png');
         this.load.image('title', 'img/race_title.png');
+        this.load.image("road", "img/playbackground.png");
 
         // load audio assets
         // this.load.audio('name', ['audio/music.mp3']);
