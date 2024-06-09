@@ -258,8 +258,64 @@ class Play extends Phaser.Scene {
         return true;
     }
 
-    // Create new barriers and add them to existing barrier group
-    addTrack() {
+    // // Create new barriers and add them to existing barrier group
+    // addTrack() {
+    //     let my = this.my;
+    //     let trackLength = 20; // Number of track pieces
+    //     let startX = game.config.width / 2;
+    //     let startY = game.config.height / 2;
+
+    //     // Initial direction is upward (north)
+    //     let currentDirection = { x: 0, y: -1, angle: -90 };
+    //     this.trackPath.push({ x: startX, y: startY, direction: currentDirection });
+
+    //     let directions = [
+    //         { x: 1, y: 0, angle: 0 },    // Right
+    //         { x: -1, y: 0, angle: 180 }, // Left
+    //         { x: 0, y: 1, angle: 90 },   // Down
+    //         { x: 0, y: -1, angle: -90 }  // Up
+    //     ];
+
+    //     let lastX = startX;
+    //     let lastY = startY;
+
+    //     for (let i = 0; i < trackLength; i++) {
+    //         let newDirection;
+    //         let newX, newY;
+    //         let isValidPosition = false;
+
+    //         while (!isValidPosition) {
+    //             newDirection = Phaser.Math.RND.pick(directions);
+    //             newX = lastX + newDirection.x * 100;
+    //             newY = lastY + newDirection.y * 100;
+
+    //             isValidPosition = this.isValidTrackPosition(newX, newY);
+
+    //             if (isValidPosition) {
+    //                 this.trackPath.push({ x: newX, y: newY, direction: newDirection });
+    //             }
+    //         }
+
+    //         let trackPiece;
+    //         if (i % 5 === 0) {
+    //             trackPiece = this.physics.add.sprite(newX, newY, "corner");
+    //             trackPiece.setAngle(newDirection.angle);
+    //         } else {
+    //             trackPiece = this.physics.add.sprite(newX, newY, "long");
+    //             trackPiece.setAngle(newDirection.angle);
+    //         }
+
+    //         trackPiece.setScale(0.5);
+    //         trackPiece.setImmovable(true); // Make track pieces immovable
+    //         my.trackArray.push(trackPiece);
+
+    //         lastX = newX;
+    //         lastY = newY;
+    //     }
+    // }
+
+     // Create new barriers and add them to existing barrier group
+     addTrack() {
         let my = this.my;
         let trackLength = 20; // Number of track pieces
         let startX = game.config.width / 2;
@@ -300,9 +356,11 @@ class Play extends Phaser.Scene {
             if (i % 5 === 0) {
                 trackPiece = this.physics.add.sprite(newX, newY, "corner");
                 trackPiece.setAngle(newDirection.angle);
+                this.setTrackPieceHitbox(trackPiece, newDirection.angle, 'corner');
             } else {
                 trackPiece = this.physics.add.sprite(newX, newY, "long");
                 trackPiece.setAngle(newDirection.angle);
+                this.setTrackPieceHitbox(trackPiece, newDirection.angle, 'long');
             }
 
             trackPiece.setScale(0.5);
@@ -311,6 +369,25 @@ class Play extends Phaser.Scene {
 
             lastX = newX;
             lastY = newY;
+        }
+    }
+
+    // Set hitbox size and offset based on the orientation of the track piece
+    setTrackPieceHitbox(trackPiece, angle, type) {
+        // Reset the body size to its default
+        trackPiece.body.setSize(trackPiece.width, trackPiece.height);
+
+        if (type === 'long') {
+            if (angle === 0 || angle === 180) {
+                // Horizontal
+                trackPiece.body.setSize(trackPiece.displayWidth, trackPiece.displayHeight);
+                // trackPiece.body.setOffset(0, trackPiece.displayHeight);
+            } else {
+                // Vertical
+                trackPiece.body.setSize(trackPiece.displayWidth * 3.25, trackPiece.displayHeight/4.2);
+                // trackPiece.body.setOffset(trackPiece.displayWidth / 4, 0);
+                
+            }
         }
     }
 
