@@ -49,6 +49,9 @@ class Play extends Phaser.Scene {
             callbackScope: this,
             loop: true
         });
+
+        // Enable collision detection between the car and the traffic group
+        this.physics.add.collider(my.sprite.car, this.trafficGroup, this.handleCollision, null, this);
     }
 
     update() {
@@ -98,10 +101,12 @@ class Play extends Phaser.Scene {
         this.setTrafficVelocity(this.carSpeed);
     }
 
-    collides(a, b) {
-        if (Math.abs(a.x - b.x) > (a.displayWidth / 2 + b.displayWidth / 2)) return false;
-        if (Math.abs(a.y - b.y) > (a.displayHeight / 2 + b.displayHeight / 2)) return false;
-        return true;
+    handleCollision(car, traffic) {
+        console.log("crash");
+        // Handle the collision logic here (e.g., end game, reduce speed, etc.)
+        car.setTint(0xff0000); // Example: change the car color to red on collision
+        this.carSpeed = 0; // Stop the car
+        this.engineSound.stop(); // Stop the engine sound
     }
 
     setTrafficVelocity(speed) {
