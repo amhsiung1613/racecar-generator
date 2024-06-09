@@ -9,7 +9,7 @@ class Play extends Phaser.Scene {
         this.rotationSpeed = 0.05;
 
         this.spawnDelay = 2000; // Initial spawn delay for traffic
-        this.speed = 100; // Initial speed for traffic
+        this.trafficSpeed = 100; // Initial speed for traffic
 
         this.startX = game.config.width / 2; // Set a default start position
         this.startY = game.config.height - 100;
@@ -23,7 +23,6 @@ class Play extends Phaser.Scene {
         my.sprite.car.setCollideWorldBounds(true);
         my.sprite.car.setDepth(1);
 
-        this.physics.world.setBounds(0, game.config.height * 0.25, game.config.width, game.config.height);
         this.cameras.main.setBounds(0, 0, game.config.width, game.config.height);
         this.cameras.main.startFollow(my.sprite.car);
 
@@ -93,12 +92,42 @@ class Play extends Phaser.Scene {
             console.log("car off track");
         }
 
+        // Adjust car hitbox to fit the car's current angle
+        this.updateCarHitbox(car);
+
         // Move and wrap background image
-        this.backgroundImage.tilePositionY -= this.carSpeed / 10;
+        this.backgroundImage.tilePositionY -= 2;
         this.wrapBackground();
         
         // Update traffic speed
-        this.setTrafficVelocity(this.carSpeed);
+        this.setTrafficVelocity(this.trafficSpeed);
+
+        // Remove obstacles that are out of the play/screen zone
+        this.trafficGroup.getChildren().forEach((traffic) => {
+            if (traffic.y > game.config.height) {
+                traffic.destroy();
+            }
+        });
+
+        // Update world bounds to follow the camera's bounds for the bottom 75% of the screen
+        const topBound = game.config.height * 0.25;
+        const heightBound = game.config.height * 0.75;
+        this.physics.world.setBounds(
+            this.cameras.main.scrollX,
+            this.cameras.main.scrollY + topBound,
+            this.cameras.main.width,
+            heightBound
+        );
+    }
+
+    updateCarHitbox(car) {
+        // Get the current angle in radians
+        const angle = Phaser.Math.DegToRad(car.angle);
+        // Calculate the width and height based on the angle
+        const width = Math.abs(car.width * Math.cos(angle)) + Math.abs(car.height * Math.sin(angle));
+        const height = Math.abs(car.width * Math.sin(angle)) + Math.abs(car.height * Math.cos(angle));
+        // Set the car hitbox size and offset
+        car.body.setSize(width, height, true);
     }
 
     handleCollision(car, traffic) {
@@ -111,7 +140,7 @@ class Play extends Phaser.Scene {
 
     setTrafficVelocity(speed) {
         this.trafficGroup.getChildren().forEach((traffic) => {
-            traffic.setVelocityY(speed * 0.5); // Adjust traffic speed to match the car speed
+            traffic.setVelocityY(speed); // Adjust traffic speed to the defined traffic speed
         });
     }
 
@@ -133,7 +162,7 @@ class Play extends Phaser.Scene {
         const randomSprite = Phaser.Utils.Array.GetRandom(trafficSprites);
         const randomX = Phaser.Utils.Array.GetRandom(spawnPositions);
         const traffic = this.physics.add.sprite(randomX, -150, randomSprite).setScale(0.3);
-        traffic.setVelocityY(this.speed); // Set initial velocity to match the road speed
+        traffic.setVelocityY(this.trafficSpeed); // Set initial velocity for the traffic
         this.trafficGroup.add(traffic);
     }
 }

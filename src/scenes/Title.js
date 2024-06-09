@@ -59,7 +59,7 @@ class Title extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(this.keys.space)) {
             this.startSound.play();
             // Start next scene
-            this.time.delayedCall(1000, () => {
+            this.time.delayedCall(500, () => {
                 this.scene.start('playScene');
             });
         }
