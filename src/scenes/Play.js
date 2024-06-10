@@ -123,9 +123,6 @@ class Play extends Phaser.Scene {
                     this.carSpeed = 0;
                 }
             }
-        } else {
-            this.carSpeed = 10;
-            console.log("car off track");
         }
     
         // Adjust car hitbox to fit the car's current angle
@@ -173,6 +170,7 @@ class Play extends Phaser.Scene {
         car.setTint(0xff0000); // Example: change the car color to red on collision
         this.carSpeed = 0; // Stop the car
         this.engineSound.stop(); // Stop the engine sound
+        this.scene.restart();
 
         // Stop the timer and end the game
         this.timer.paused = true;
