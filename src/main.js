@@ -17,7 +17,7 @@ let config = {
     parent: 'myGame',
     type: Phaser.AUTO,
     height: 700,
-    width: 700,
+    width: 900,
     pixelArt: true,
     scale: {
         mode: Phaser.Scale.FIT,

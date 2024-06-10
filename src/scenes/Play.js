@@ -39,8 +39,9 @@ class Play extends Phaser.Scene {
         this.engineSound = this.sound.add('engine', { loop: true });
         this.engineSound.play();
 
-        // Display background image
-        this.backgroundImage = this.add.tileSprite(0, 0, 700, 700, "road").setOrigin(0, 0);
+        // Display background images
+        this.backgroundImage1 = this.add.tileSprite(0, 0, 700, 700, "road").setOrigin(0, 0);
+        this.backgroundImage2 = this.add.tileSprite(0, -700, 700, 700, "road2").setOrigin(0, 0);
 
         // Group for traffic
         this.trafficGroup = this.physics.add.group();
@@ -130,9 +131,10 @@ class Play extends Phaser.Scene {
         // Adjust car hitbox to fit the car's current angle
         this.updateCarHitbox(car);
     
-        // Move and wrap background image
-        this.backgroundImage.tilePositionY -= 2;
-        this.wrapBackground();
+        // Move and wrap background images
+        this.backgroundImage1.tilePositionY += 2;
+        this.backgroundImage2.tilePositionY += 2;
+        this.wrapBackgrounds();
         
         // Update traffic speed
         this.setTrafficVelocity(this.trafficSpeed);
@@ -148,9 +150,9 @@ class Play extends Phaser.Scene {
         const topBound = game.config.height * 0.25;
         const heightBound = game.config.height * 0.75;
         this.physics.world.setBounds(
-            this.backgroundImage.x,
+            this.backgroundImage1.x,
             this.cameras.main.scrollY + topBound,
-            this.backgroundImage.width,
+            this.backgroundImage1.width,
             heightBound
         );
     }
@@ -182,15 +184,15 @@ class Play extends Phaser.Scene {
         });
     }
 
-    wrapBackground() {
-        const bgHeight = this.backgroundImage.height;
+    wrapBackgrounds() {
+        const bgHeight = this.backgroundImage1.height;
 
-        if (this.backgroundImage.y <= -bgHeight) {
-            this.backgroundImage.y = this.sys.game.config.height;
-        }
-
-        if (this.backgroundImage.y >= this.sys.game.config.height) {
-            this.backgroundImage.y = -bgHeight;
+        if (this.backgroundImage1.tilePositionY >= bgHeight) {
+            this.backgroundImage1.tilePositionY = 0;
+            this.backgroundImage2.tilePositionY = -bgHeight;
+        } else if (this.backgroundImage2.tilePositionY >= bgHeight) {
+            this.backgroundImage2.tilePositionY = 0;
+            this.backgroundImage1.tilePositionY = -bgHeight;
         }
     }
 
