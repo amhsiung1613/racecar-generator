@@ -202,6 +202,8 @@ class Play extends Phaser.Scene {
         this.carSpeed = 0;
         this.engineSound.stop();
         this.timer.paused = true;
+        this.carCrash = this.sound.add('carCrash');
+        this.carCrash.play();
 
         // Show the game over overlay and menu
         this.gameOverOverlay.setVisible(true);
