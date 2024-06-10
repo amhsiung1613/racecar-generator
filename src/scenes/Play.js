@@ -7,6 +7,7 @@ class Play extends Phaser.Scene {
         this.acceleration = 10;
         this.deceleration = 5;
         this.rotationSpeed = 0.05;
+        this.driftSpeed = 50; // Speed for sideways drift movement
 
         this.spawnDelay = 2000; // Initial spawn delay for traffic
         this.trafficSpeed = 100; // Initial speed for traffic
@@ -24,6 +25,7 @@ class Play extends Phaser.Scene {
         my.sprite.car.setScale(0.025);
         my.sprite.car.setCollideWorldBounds(true);
         my.sprite.car.setDepth(1);
+        my.sprite.car.angle = -90; // Set initial angle to -90 degrees to face upwards
 
         this.cameras.main.setBounds(0, 0, game.config.width, game.config.height);
         this.cameras.main.startFollow(my.sprite.car);
@@ -68,35 +70,55 @@ class Play extends Phaser.Scene {
 
     update() {
         let car = this.my.sprite.car;
-
+    
         let pitch = 1 + (this.carSpeed / this.maxSpeed);
         this.engineSound.setRate(pitch);
-
+    
         this.physics.velocityFromRotation(
             Phaser.Math.DegToRad(car.angle),
             this.carSpeed,
             car.body.velocity
         );
-
+    
         let isOnTrack = true;
-
+    
         if (isOnTrack) {
             if (this.left.isDown) {
-                car.angle -= Phaser.Math.RadToDeg(this.rotationSpeed);
+                if (car.angle > -170) { // Limit the left rotation to -180 degrees (90 degrees from initial -90)
+                    car.angle -= Phaser.Math.RadToDeg(this.rotationSpeed);
+                    car.x -= this.driftSpeed * this.game.loop.delta / 1000; // Add sideways drift to the left
+                }
             } else if (this.right.isDown) {
-                car.angle += Phaser.Math.RadToDeg(this.rotationSpeed);
+                if (car.angle < -10) { // Limit the right rotation to 0 degrees (90 degrees from initial -90)
+                    car.angle += Phaser.Math.RadToDeg(this.rotationSpeed);
+                    car.x += this.driftSpeed * this.game.loop.delta / 1000; // Add sideways drift to the right
+                }
+            } else {
+                // Slowly straighten the car if no left/right input
+                if (car.angle < -90) {
+                    car.angle += Phaser.Math.RadToDeg(this.rotationSpeed / 2);
+                } else if (car.angle > -90) {
+                    car.angle -= Phaser.Math.RadToDeg(this.rotationSpeed / 2);
+                }
             }
-
+    
             if (this.up.isDown) {
                 this.carSpeed += this.acceleration;
                 if (this.carSpeed > this.maxSpeed) {
                     this.carSpeed = this.maxSpeed;
                 }
+            } else if (this.down.isDown) {
+                this.carSpeed -= this.acceleration;
+                if (this.carSpeed < -this.maxSpeed / 2) { // Allowing half of maxSpeed for reverse speed
+                    this.carSpeed = -this.maxSpeed / 2;
+                }
             } else {
                 if (this.carSpeed > 0) {
                     this.carSpeed -= this.deceleration;
+                } else if (this.carSpeed < 0) {
+                    this.carSpeed += this.deceleration;
                 }
-                if (this.carSpeed < 0) {
+                if (Math.abs(this.carSpeed) < this.deceleration) {
                     this.carSpeed = 0;
                 }
             }
@@ -104,24 +126,24 @@ class Play extends Phaser.Scene {
             this.carSpeed = 10;
             console.log("car off track");
         }
-
+    
         // Adjust car hitbox to fit the car's current angle
         this.updateCarHitbox(car);
-
+    
         // Move and wrap background image
         this.backgroundImage.tilePositionY -= 2;
         this.wrapBackground();
         
         // Update traffic speed
         this.setTrafficVelocity(this.trafficSpeed);
-
+    
         // Remove obstacles that are out of the play/screen zone
         this.trafficGroup.getChildren().forEach((traffic) => {
             if (traffic.y > game.config.height) {
                 traffic.destroy();
             }
         });
-
+    
         // Update world bounds to follow the camera's bounds for the bottom 75% of the screen
         const topBound = game.config.height * 0.25;
         const heightBound = game.config.height * 0.75;
@@ -173,7 +195,7 @@ class Play extends Phaser.Scene {
     }
 
     spawnTraffic() {
-        const trafficSprites = ["deer", "banana", "weed"];
+        const trafficSprites = ["deer", "banana"];
         const spawnPositions = [200, 300, 400, 500];
         const randomSprite = Phaser.Utils.Array.GetRandom(trafficSprites);
         const randomX = Phaser.Utils.Array.GetRandom(spawnPositions);
