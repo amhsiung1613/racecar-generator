@@ -15,7 +15,13 @@ class Play extends Phaser.Scene {
         this.startX = game.config.width / 2; // Set a default start position
         this.startY = game.config.height - 100;
 
+        
+    }
+
+    init() {
         this.score = 0; // Initialize score
+        this.startX = game.config.width / 2; // Set a default start position
+        this.startY = game.config.height - 100;
     }
 
     create() {
