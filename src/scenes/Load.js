@@ -21,9 +21,9 @@ class Load extends Phaser.Scene {
         // load graphics assets
         // this.load.image('name', 'img/path.png');
         this.load.image('car', 'img/car.png');
-        this.load.image('corner', 'img/corner_track.png');
-        this.load.image('long', 'img/long_track.png');
-        this.load.image('med', 'img/med_track.png');
+        this.load.image('banana', 'img/banana-peel.png');
+        this.load.image('deer', 'img/deer.png');
+        this.load.image('weed', 'img/tumbleweed.png');
         this.load.image('short', 'img/short_track.png');
         this.load.image('title', 'img/race_title.png');
         this.load.image("road", "img/playbackground.png");

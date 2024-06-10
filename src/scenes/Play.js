@@ -13,6 +13,8 @@ class Play extends Phaser.Scene {
 
         this.startX = game.config.width / 2; // Set a default start position
         this.startY = game.config.height - 100;
+
+        this.score = 0; // Initialize score
     }
 
     create() {
@@ -51,6 +53,17 @@ class Play extends Phaser.Scene {
 
         // Enable collision detection between the car and the traffic group
         this.physics.add.collider(my.sprite.car, this.trafficGroup, this.handleCollision, null, this);
+
+        // Create the score text
+        this.scoreText = this.add.text(game.config.width - 150, 10, 'Score: 0', { fontSize: '20px', fill: '#FFF' });
+        
+        // Start the timer to track the score
+        this.timer = this.time.addEvent({
+            delay: 1000, // Update every second
+            callback: this.updateScore,
+            callbackScope: this,
+            loop: true
+        });
     }
 
     update() {
@@ -113,9 +126,9 @@ class Play extends Phaser.Scene {
         const topBound = game.config.height * 0.25;
         const heightBound = game.config.height * 0.75;
         this.physics.world.setBounds(
-            this.cameras.main.scrollX,
+            this.backgroundImage.x,
             this.cameras.main.scrollY + topBound,
-            this.cameras.main.width,
+            this.backgroundImage.width,
             heightBound
         );
     }
@@ -136,6 +149,9 @@ class Play extends Phaser.Scene {
         car.setTint(0xff0000); // Example: change the car color to red on collision
         this.carSpeed = 0; // Stop the car
         this.engineSound.stop(); // Stop the engine sound
+
+        // Stop the timer and end the game
+        this.timer.paused = true;
     }
 
     setTrafficVelocity(speed) {
@@ -157,12 +173,17 @@ class Play extends Phaser.Scene {
     }
 
     spawnTraffic() {
-        const trafficSprites = ["corner", "long", "med"];
+        const trafficSprites = ["deer", "banana", "weed"];
         const spawnPositions = [200, 300, 400, 500];
         const randomSprite = Phaser.Utils.Array.GetRandom(trafficSprites);
         const randomX = Phaser.Utils.Array.GetRandom(spawnPositions);
-        const traffic = this.physics.add.sprite(randomX, -150, randomSprite).setScale(0.3);
+        const traffic = this.physics.add.sprite(randomX, -150, randomSprite).setScale(0.2);
         traffic.setVelocityY(this.trafficSpeed); // Set initial velocity for the traffic
         this.trafficGroup.add(traffic);
+    }
+
+    updateScore() {
+        this.score += 1; // Increment the score by 1 every second
+        this.scoreText.setText('Score: ' + this.score); // Update the score text
     }
 }
