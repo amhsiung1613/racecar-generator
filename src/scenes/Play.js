@@ -14,8 +14,6 @@ class Play extends Phaser.Scene {
 
         this.startX = game.config.width / 2; // Set a default start position
         this.startY = game.config.height - 100;
-
-        
     }
 
     init() {
@@ -63,9 +61,15 @@ class Play extends Phaser.Scene {
         // Enable collision detection between the car and the traffic group
         this.physics.add.collider(my.sprite.car, this.trafficGroup, this.handleCollision, null, this);
 
+        // Load high score
+        this.highScore = this.loadHighScore();
+
+        // Create the high score text
+        this.highScoreText = this.add.text(game.config.width - 180, 10, 'High Score: ' + this.highScore, { fontSize: '20px', fill: '#FFF' });
+
         // Create the score text
-        this.scoreText = this.add.text(game.config.width - 150, 10, 'Score: 0', { fontSize: '20px', fill: '#FFF' });
-        
+        this.scoreText = this.add.text(game.config.width - 180, 40, 'Score: 0', { fontSize: '20px', fill: '#FFF' });
+
         // Start the timer to track the score
         this.timer = this.time.addEvent({
             delay: 1000, // Update every second
@@ -73,22 +77,44 @@ class Play extends Phaser.Scene {
             callbackScope: this,
             loop: true
         });
+
+        // Create the game over overlay and menu (initially hidden)
+        this.gameOverOverlay = this.add.graphics();
+        this.gameOverOverlay.fillStyle(0x000000, 0.5); // Gray transparent box
+        this.gameOverOverlay.fillRect(0, 0, game.config.width, game.config.height);
+        this.gameOverOverlay.setDepth(10);
+        this.gameOverOverlay.setVisible(false);
+
+        this.gameOverText = this.add.text(game.config.width / 2, game.config.height / 2 - 50, 'Game Over', {
+            fontSize: '32px',
+            fill: '#fff'
+        }).setOrigin(0.5).setDepth(10).setVisible(false);
+
+        this.menuText = this.add.text(game.config.width / 2, game.config.height / 2, 'Press T for Title, C for Credits, R to Restart', {
+            fontSize: '20px',
+            fill: '#fff'
+        }).setOrigin(0.5).setDepth(10).setVisible(false);
+
+        // Add input keys for menu options
+        this.input.keyboard.on('keydown-T', this.goToTitle, this);
+        this.input.keyboard.on('keydown-C', this.showCredits, this);
+        this.input.keyboard.on('keydown-R', this.restartGame, this);
     }
 
     update() {
         let car = this.my.sprite.car;
-    
+
         let pitch = 1 + (this.carSpeed / this.maxSpeed);
         this.engineSound.setRate(pitch);
-    
+
         this.physics.velocityFromRotation(
             Phaser.Math.DegToRad(car.angle),
             this.carSpeed,
             car.body.velocity
         );
-    
+
         let isOnTrack = true;
-    
+
         if (isOnTrack) {
             if (this.left.isDown) {
                 if (car.angle > -170) { // Limit the left rotation to -180 degrees (90 degrees from initial -90)
@@ -108,7 +134,7 @@ class Play extends Phaser.Scene {
                     car.angle -= Phaser.Math.RadToDeg(this.rotationSpeed / 2);
                 }
             }
-    
+
             if (this.up.isDown) {
                 this.carSpeed += this.acceleration;
                 if (this.carSpeed > this.maxSpeed) {
@@ -130,25 +156,25 @@ class Play extends Phaser.Scene {
                 }
             }
         }
-    
+
         // Adjust car hitbox to fit the car's current angle
         this.updateCarHitbox(car);
-    
+
         // Move and wrap background images
         this.backgroundImage1.tilePositionY += 2;
         this.backgroundImage2.tilePositionY += 2;
         this.wrapBackgrounds();
-        
+
         // Update traffic speed
         this.setTrafficVelocity(this.trafficSpeed);
-    
+
         // Remove obstacles that are out of the play/screen zone
         this.trafficGroup.getChildren().forEach((traffic) => {
             if (traffic.y > game.config.height) {
                 traffic.destroy();
             }
         });
-    
+
         // Update world bounds to follow the camera's bounds for the bottom 75% of the screen
         const topBound = game.config.height * 0.25;
         const heightBound = game.config.height * 0.75;
@@ -172,14 +198,19 @@ class Play extends Phaser.Scene {
 
     handleCollision(car, traffic) {
         console.log("crash");
-        // Handle the collision logic here (e.g., end game, reduce speed, etc.)
-        car.setTint(0xff0000); // Example: change the car color to red on collision
-        this.carSpeed = 0; // Stop the car
-        this.engineSound.stop(); // Stop the engine sound
-        this.scene.restart();
-
-        // Stop the timer and end the game
+        car.setTint(0xff0000);
+        this.carSpeed = 0;
+        this.engineSound.stop();
         this.timer.paused = true;
+
+        // Show the game over overlay and menu
+        this.gameOverOverlay.setVisible(true);
+        this.gameOverText.setVisible(true);
+        this.menuText.setVisible(true);
+
+        // Pause the physics and traffic spawn event
+        this.physics.pause();
+        this.spawnTrafficEvent.paused = true;
     }
 
     setTrafficVelocity(speed) {
@@ -213,5 +244,28 @@ class Play extends Phaser.Scene {
     updateScore() {
         this.score += 1; // Increment the score by 1 every second
         this.scoreText.setText('Score: ' + this.score); // Update the score text
+
+        if (this.score > this.highScore) {
+            this.highScore = this.score;
+            this.highScoreText.setText('High Score: ' + this.highScore);
+            localStorage.setItem('highScore', this.highScore); // Save the new high score
+        }
+    }
+
+    loadHighScore() {
+        const savedHighScore = localStorage.getItem('highScore');
+        return savedHighScore ? parseInt(savedHighScore, 10) : 0;
+    }
+
+    goToTitle() {
+        this.scene.start('titleScene');
+    }
+
+    showCredits() {
+        this.scene.start('creditsScene');
+    }
+
+    restartGame() {
+        this.scene.restart();
     }
 }
